@@ -119,6 +119,13 @@
 			var thisItem = this.$items.eq(i);
 			this.positionItem(thisItem);
 		}
+
+		// remove positioning from single item
+		this.$items.on("removepositioning", $.proxy(this.removeItemPositioning, this));
+
+		// remove positioning from all items
+		this.$el.on("removeallpositioning", $.proxy(this.removeAllPositioning, this));
+
 	};
 
 	Positioner.prototype = {
@@ -209,6 +216,22 @@
 			this.width = newWidth;
 			this.iterator++;
 			this.whileIterator = 0;
+		},
+		removeItemPositioning: function(e){
+			$(e.target).css({
+				top: '',
+				left: '',
+				position: "relative"
+			});
+		},
+		removeAllPositioning: function() {
+			this.$items.each(function(){
+				$(this).css({
+					top: '',
+					left: '',
+					position: "relative"
+				});
+			});
 		}
 	};
 
