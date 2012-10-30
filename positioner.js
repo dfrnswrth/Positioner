@@ -1,5 +1,7 @@
-/*
- *	Plugin: Positioner
+/**
+ *	Positioner - jQuery plugin for random resizing and positioning
+ *	copyright (c) 2012 Dylan Farnsworth. [far.nsworth.com]
+ *	Released under the MIT license.
  */
 /*jshint jquery:true smarttabs:true*/
 /*global define*/
@@ -12,13 +14,11 @@
 }(function ($) {
 	"use strict";
 
-	/*
+	/*****************************************************************
 	 *	Utility Functions
-	 */
+	 ****************************************************************/
 	var Utils = {
-		// getRandomFromArray: function(arr){
-		// 	return arr[ Math.floor(Math.random()*arr.length) ];
-		// },
+		//	returns a random number between 0 and passed value (max)
 		getRandomNumber: function(max){
 			return Math.floor(Math.random()*max);
 		},
@@ -40,11 +40,9 @@
 			};
 		},
 
-		/**
-		 *	checkForCollisions()
-		 *	coordinates: nw, ne, se, sw
-		 *	returns true for collisions
-		 */
+		//	checkForCollisions()
+		//	coordinates: nw, ne, se, sw
+		//	returns true for collisions
 		checkForCollisions: function(item, excluded){
 			// the first object is always ok
 			if (!excluded.length) return false;
@@ -98,9 +96,9 @@
 		}
 	};
 
-	/*
+	/*****************************************************************
 	 *	Positioner
-	 */
+	 ****************************************************************/
 	var Positioner = function(element, options){
 		this.$el = element;
 		this.$el.css({position: "relative"});
@@ -126,6 +124,10 @@
 	};
 
 	Positioner.prototype = {
+
+		//	getData()
+		//	stores available coordinates for each item needing positioning
+		//	restarted if iterator exceeds max. This is a simple performance hack
 		getData: function(){
 			// Reset All
 			this.filledAreas = [];
@@ -138,6 +140,10 @@
 				this.getOkCoordinates(thisItem);
 			}
 		},
+
+		//	resizes elements based on options.widths[]
+		//	adds appropriate class if needed
+		//	stores values to object.data("Positioner.dimensions")
 		getDimensions: function(item){
 			var itemWidth = item.outerWidth(),
 				itemHeight = item.outerHeight(),
@@ -153,9 +159,16 @@
 			// how much area do we need at a minimum?
 			this.requiredArea = this.requiredArea + requiredArea;
 		},
+
+		//	Positions element without collisions
+		//	whiteIterator is used to check how many times we've tried to position it
+		//	modify whileIteratorMax and iteratorMax to modify plugin performance
 		getOkCoordinates: function(item){
 			this.whileIterator = 0;
-			var itemData = item.data("Positioner.dimensions"),
+
+			var whileIteratorMax = 100,	//	max while loop iterations
+				iteratorMax = 3,		//	max full iterations before reset
+				itemData = item.data("Positioner.dimensions"),
 				height = itemData.height,
 				width = itemData.width,
 				outerHeight = itemData.height + this.options.margin,
@@ -172,6 +185,7 @@
 				sw = [ left, top + outerHeight ],
 				coordinates = [nw,ne,se,sw];
 
+			// Collision positioner loop
 			while (Utils.checkForCollisions(coordinates,this.filledAreas)){
 				itemData = item.data("Positioner.dimensions"),
 				height = itemData.height,
@@ -186,17 +200,22 @@
 
 				this.whileIterator++;
 
-				if (this.whileIterator > 100) {
+				// if we've exceeded the max, increase parent size
+				if (this.whileIterator > whileIteratorMax) {
 					this.increaseElementSize();
 				}
-				if (this.iterator > 3) {
-					this.getData();
+				// if we've exceeded max more than 3 times, reposition all elements
+				if (this.iterator > iteratorMax) {
+					this.getData();	// starts all over again
 					break;
 				}
 			}
+
 			item.data("Positioner.coordinates", {left: left, top: top});
 			this.filledAreas.push(coordinates);
 		},
+
+		// Positions an individual item
 		positionItem: function(item) {
 			var itemDimensions = item.data("Positioner.dimensions"),
 				itemCoordinates = item.data("Positioner.coordinates");
@@ -211,6 +230,8 @@
 
 			item.trigger("positioned");
 		},
+
+		// Positions all child elements
 		positionAll: function(){
 			var triggerCount = this.$items.length - 1;
 			for (var i = 0; i < this.$items.length; i++) {
@@ -219,6 +240,8 @@
 				if (i === triggerCount) this.$el.trigger("itemsPositioned");
 			}
 		},
+
+		// increases container size if children can't be positioned
 		increaseElementSize: function(){
 			var newWidth, newHeight;
 			if (this.options.dimensionToExpand === "width") {
@@ -233,6 +256,8 @@
 			this.iterator++;
 			this.whileIterator = 0;
 		},
+
+		// returns item to original positioning
 		removeItemPositioning: function(e){
 			$(e.target).css({
 				top: '',
@@ -240,6 +265,8 @@
 				position: "relative"
 			});
 		},
+
+		// returns all children elements to original positioning
 		removeAllPositioning: function() {
 			this.$items.each(function(){
 				$(this).css({
@@ -256,7 +283,6 @@
 			var target = $(this);
 			new Positioner(target, options);
 		});
-
 		return this;
 	};
 
