@@ -16,9 +16,9 @@
 	 *	Utility Functions
 	 */
 	var Utils = {
-		getRandomFromArray: function(arr){
-			return arr[ Math.floor(Math.random()*arr.length) ];
-		},
+		// getRandomFromArray: function(arr){
+		// 	return arr[ Math.floor(Math.random()*arr.length) ];
+		// },
 		getRandomNumber: function(max){
 			return Math.floor(Math.random()*max);
 		},
@@ -43,48 +43,50 @@
 		/**
 		 *	checkForCollisions()
 		 *	coordinates: nw, ne, se, sw
+		 *	returns true for collisions
 		 */
 		checkForCollisions: function(item, excluded){
+			// the first object is always ok
 			if (!excluded.length) return false;
 			var collision = false;
 			for (var i = 0; i < excluded.length; i++) {
-				var tester = excluded[i];
-				if (// is item[nw] excluded ?
+				var tester = excluded[i]; // area we're testing against
+				if (// is item[nw] excluded?
 					(	item[0][0] >= tester[0][0] &&
 						item[0][0] <= tester[1][0] &&
 						item[0][1] >= tester[0][1] &&
-						item[0][1] <= tester[3][1] ) ||
-					// is item[ne] excluded ?
+						item[0][1] <= tester[3][1]) ||
+					// is item[ne] excluded?
 					(	item[1][0] >= tester[0][0] &&
 						item[1][0] <= tester[1][0] &&
 						item[1][1] >= tester[0][1] &&
 						item[1][1] <= tester[3][1]) ||
-					// is item[se] excluded ?
+					// is item[se] excluded?
 					(	item[2][0] >= tester[0][0] &&
 						item[2][0] <= tester[1][0] &&
 						item[2][1] >= tester[0][1] &&
 						item[2][1] <= tester[3][1]) ||
-					// is item[sw] excluded ?
+					// is item[sw] excluded?
 					(	item[3][0] >= tester[0][0] &&
 						item[3][0] <= tester[1][0] &&
 						item[3][1] >= tester[0][1] &&
 						item[3][1] <= tester[3][1]) ||
-					// is tester[nw] excluded ?
+					// is tester[nw] excluded?
 					(	tester[0][0] >= item[0][0] &&
 						tester[0][0] <= item[1][0] &&
 						tester[0][1] >= item[0][1] &&
-						tester[0][1] <= item[3][1] ) ||
-					// is tester[ne] excluded ?
+						tester[0][1] <= item[3][1]) ||
+					// is tester[ne] excluded?
 					(	tester[1][0] >= item[0][0] &&
 						tester[1][0] <= item[1][0] &&
 						tester[1][1] >= item[0][1] &&
 						tester[1][1] <= item[3][1]) ||
-					// is tester[se] excluded ?
+					// is tester[se] excluded?
 					(	tester[2][0] >= item[0][0] &&
 						tester[2][0] <= item[1][0] &&
 						tester[2][1] >= item[0][1] &&
 						tester[2][1] <= item[3][1]) ||
-					// is tester[sw] excluded ?
+					// is tester[sw] excluded?
 					(	tester[3][0] >= item[0][0] &&
 						tester[3][0] <= item[1][0] &&
 						tester[3][1] >= item[0][1] &&
@@ -114,18 +116,13 @@
 		this.iterator = 0;
 
 		this.getData();
-
-		for (var i = 0; i < this.$items.length; i++) {
-			var thisItem = this.$items.eq(i);
-			this.positionItem(thisItem);
-		}
+		this.positionAll();
 
 		// remove positioning from single item
 		this.$items.on("removepositioning", $.proxy(this.removeItemPositioning, this));
 
 		// remove positioning from all items
 		this.$el.on("removeallpositioning", $.proxy(this.removeAllPositioning, this));
-
 	};
 
 	Positioner.prototype = {
@@ -151,7 +148,7 @@
 				requiredArea = (dimensions.height + this.options.margin) * (dimensions.width  + this.options.margin);
 
 			item.data("Positioner.dimensions", dimensions)
-				 .addClass(classToAdd);
+				.addClass(classToAdd);
 
 			// how much area do we need at a minimum?
 			this.requiredArea = this.requiredArea + requiredArea;
@@ -186,7 +183,9 @@
 				se = [ left + outerWidth, top + outerHeight ],
 				sw = [ left, top + outerHeight ],
 				coordinates = [nw,ne,se,sw];
+
 				this.whileIterator++;
+
 				if (this.whileIterator > 100) {
 					this.increaseElementSize();
 				}
@@ -209,11 +208,28 @@
 				left: itemCoordinates.left + this.options.containerPadding[3],
 				top: itemCoordinates.top + this.options.containerPadding[0]
 			});
+
+			item.trigger("positioned");
 		},
-		increaseElementSize: function() {
-			var newWidth = this.width + 200;
-			this.$el.css({ "width": newWidth });
-			this.width = newWidth;
+		positionAll: function(){
+			var triggerCount = this.$items.length - 1;
+			for (var i = 0; i < this.$items.length; i++) {
+				var thisItem = this.$items.eq(i);
+				this.positionItem(thisItem);
+				if (i === triggerCount) this.$el.trigger("itemsPositioned");
+			}
+		},
+		increaseElementSize: function(){
+			var newWidth, newHeight;
+			if (this.options.dimensionToExpand === "width") {
+				newWidth = this.width + this.options.expandBy;
+				this.$el.css({ "width": newWidth });
+				this.width = newWidth;
+			} else {
+				newHeight = this.height + this.options.expandBy;
+				this.$el.css({ "height": newHeight });
+				this.height = newHeight;
+			}
 			this.iterator++;
 			this.whileIterator = 0;
 		},
@@ -248,6 +264,7 @@
 		classes: [],					// classes for widths
 		containerPadding: [0,0,0,0],	// padding (in css order)
 		dimensionToExpand: "width",		// base side for dimemsional calculation
+		expandBy: 200,					// px incriment to expand parent element
 		margin: 0,						// margin for each element
 		item: null,						// item selector
 		widths: []						// available widths
