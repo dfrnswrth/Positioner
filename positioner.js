@@ -18,10 +18,12 @@
 	 *	Utility Functions
 	 ****************************************************************/
 	var Utils = {
+
 		//	returns a random number between 0 and passed value (max)
 		getRandomNumber: function(max){
 			return Math.floor(Math.random()*max);
 		},
+
 		//	Resize with Aspect Ratio
 		//	origHeight and origWidth are required
 		//	either newHeight or newWidth are required
@@ -204,7 +206,7 @@
 				if (this.whileIterator > whileIteratorMax) {
 					this.increaseElementSize();
 				}
-				// if we've exceeded max more than 3 times, reposition all elements
+				// if we've exceeded iteratorMax, reposition all elements
 				if (this.iterator > iteratorMax) {
 					this.getData();	// starts all over again
 					break;
