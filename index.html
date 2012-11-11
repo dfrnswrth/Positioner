@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Positioner.js</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+	</head>
+	<body>
+		<div class="page_wrap">
+			<h1>Positioner.js</h1>
+			<h2>jQuery random sizing and positioning.<br/>It's like the anti-masonry.</h2>
+			<p>
+				Apply $.positioner to the container element.<br/>
+				Positioner requires a minimum of the following two parameters:
+			</p>
+			<ol>
+				<li><code>item</code>: the child elements selector to be positioned</li>
+				<li><code>widths</code>: array of widths to apply to the positioned elements</li>
+			</ol>
+			<pre><code>$(".container").positioner({
+	item: ".target",
+	widths: [40, 80, 100]
+});
+			</code></pre>
+			<div class="container">
+				<div class="target one"></div>
+				<div class="target two"></div>
+				<div class="target three"></div>
+				<div class="target four"></div>
+				<div class="target five"></div>
+				<div class="target six"></div>
+			</div>
+		</div>
+		<script src="js/jquery.js"></script>
+		<script src="https://raw.github.com/dfarnsworth/Positioner/master/positioner.js"></script>
+		<script src="js/main.js"></script>
+	</body>
+</html>
