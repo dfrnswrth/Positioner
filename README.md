@@ -3,7 +3,7 @@ Positioner
 
 jQuery plugin for randomly sizing and positioning DOM elements. It's like the anti-masonry.
 
-(http://dfarnsworth.github.com/Positioner/)[Demo]
+[http://dfarnsworth.github.com/Positioner](Demo)
 
 ##	About
 
@@ -14,7 +14,7 @@ Positioner does the following:
 
 ##	Docs
 
-Check out a basic usage example at the (http://dfarnsworth.github.com/Positioner/)[Positioner github page].
+Check out a basic usage example at the [http://dfarnsworth.github.com/Positioner](Positioner) github page.
 
 Positioner has no documentation yet, but it's in-progress. Gotta get its parent project shipped first.
 
