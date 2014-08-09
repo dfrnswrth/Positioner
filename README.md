@@ -5,6 +5,8 @@ jQuery plugin for randomly sizing and positioning DOM elements. It's like the an
 
 [Demo](http://dfarnsworth.github.com/Positioner)
 
+[Production Demo](http://stories.wheaton.edu/)
+
 ##	About
 
 Positioner does the following:
